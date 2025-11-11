@@ -1,0 +1,2 @@
+cargo-lambda==1.4.0
+ziglang==0.13.0

@@ -1,0 +1,24 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+  GetScopedDataFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      MemorySize: 128
+      Handler: bootstrap
+      Runtime: provided.al2023
+      Timeout: 5
+      CodeUri: target/lambda/GetScopedData/
+      Role: arn:aws:iam::237937621781:role/get-data-lambda-role
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /path
+            Method: get
+
+Outputs:
+  FunctionName:
+    Value: !Ref GetScopedDataFunction
+    Description: Name of the Lambda function

@@ -1,0 +1,43 @@
+# Byte-compiled / optimized / archived Python bytecode
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+
+# C++ object files
+*.o
+*.a
+*.so
+
+# Executables
+*.exe
+
+# Editor/IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+tmp/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Dependency directories
+node_modules/
+vendor/
+
+# Logs
+*.log
+
+# Cargo build artifacts
+target/
+
+# Rust lock file
+Cargo.lock
+
+# Lambda function dependencies (if packaged)
+.aws-sam/
+
+rust-serverless/docker/

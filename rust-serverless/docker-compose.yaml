@@ -1,0 +1,50 @@
+services:
+  dynamodb-local:
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
+    image: "amazon/dynamodb-local:latest"
+    container_name: dynamodb-local
+    ports:
+      - "8000:8000"
+    volumes:
+      - "./docker/dynamodb:/home/dynamodblocal/data:z"
+    working_dir: /home/dynamodblocal
+  # deploy-table:
+  #   depends_on:
+  #     - dynamodb-local
+  #   build:
+  #     context: ./local-table
+  #     dockerfile: Dockerfile
+  #   container_name: deploy-table
+  #   ports:
+  #     - "8080:8080"
+  #   environment:
+  #     AWS_ACCESS_KEY_ID: 'DUMMYIDEXAMPLE'
+  #     AWS_SECRET_ACCESS_KEY: 'DUMMYEXAMPLEKEY'
+  get-scoped-data:
+    depends_on:
+      - dynamodb-local
+    build:
+      context: ./GetScopedData
+      dockerfile: Dockerfile
+    container_name: GetScopedData_container
+    environment:
+      DYNAMO_DB_URL: http://dynamodb-local:8000
+      AWS_REGION: eu-north-1
+    volumes:
+      - "./db-utils:/db-utils:z"
+    ports:
+      - "9000:9000"
+  scheduled-data-update:
+    depends_on:
+      - dynamodb-local
+    build:
+      context: ./ScheduledDataUpdate
+      dockerfile: Dockerfile
+    container_name: ScheduledDataUpdate_container
+    environment:
+      DYNAMO_DB_URL: http://dynamodb-local:8000
+      AWS_REGION: eu-north-1
+    volumes:
+      - "./db-utils:/db-utils:z"
+    ports:
+      - "9001:9000"

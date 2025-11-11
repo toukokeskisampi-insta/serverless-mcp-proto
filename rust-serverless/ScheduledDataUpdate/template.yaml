@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+  ScheduledDataUpdateFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      MemorySize: 128
+      Handler: bootstrap
+      Runtime: provided.al2023
+      Timeout: 5
+      CodeUri: target/lambda/ScheduledDataUpdate/
+      Role: arn:aws:iam::237937621781:role/scheduled-lambda-role
+  ScheduledLambdaEvent:
+    Type: AWS::Events::Rule
+    DependsOn: ScheduledDataUpdateFunction
+    Properties:
+      Name: scheduled-data-fetch
+      ScheduleExpression: rate(5 minutes)
+      State: ENABLED
+      Targets:
+        - Arn: !GetAtt 
+            - ScheduledDataUpdateFunction
+            - Arn
+          Id: DataUpdateTarget
+  UpdateLambdaEventPermission:
+    Type: AWS::Lambda::Permission
+    DependsOn: ScheduledDataUpdateFunction
+    Properties:
+      FunctionName: !GetAtt 
+          - ScheduledDataUpdateFunction
+          - Arn
+      Action: lambda:InvokeFunction
+      Principal: events.amazonaws.com
+      SourceArn: !GetAtt
+          - ScheduledLambdaEvent
+          - Arn
+
+Outputs:
+  FunctionName:
+    Value: !Ref ScheduledDataUpdateFunction
+    Description: Name of the Lambda function
