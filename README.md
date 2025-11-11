@@ -1,17 +1,35 @@
-## Setup
+# Serverless MCP prototype
+
+> Note: This project is a work-in-progress and should not be deployed to AWS (yet)
+
+This repository contains:
+- CloudFormation templates for creating the infrastucure (WIP)
+- Rust lambdas for loading/reading data from DynamoDB
+- MCP server/client to allow LLMs to read data from DynamoDB
+
+![alt architecture](https://github.com/toukokeskisampi-insta/serverless-mcp-proto/blob/master/architecture.png?raw=true)
+
+## Requirements
+
+- Ollama installed locally https://ollama.com/
+- Docker/podman + docker-compose
+- Can't remeber what else, maybe some rust stuff if you wan't to build them on your own machine also
+
+## Database + Lambda local setup
+
+### Local environment setup
+
+Run the docker compose project inside `./rust-serverless`
 
 ``` bash
-python -m venv env
-source env/bin/activate
+docker-compose up --build
 ```
 
-## Local dev
+On the first run uncomment the "deploy-table" part in "docker-compose.yaml" so the table is created.
 
-``` bash
-cargo lambda watch
-```
+Then you can use the `test.sh` to call the loader function and the getter function. Or just do it from command line.
 
-## Create new function
+### Creating new Rust lambdas
 
 ``` bash
 cargo lambda new YOUR_FUNCTION_NAME
@@ -38,14 +56,15 @@ async fn func(event: LambdaEvent<Value>) -> Result<Value, Error> {
 }
 ```
 
+## MCP Client / Server
+
+Follow instructions for installing client in https://github.com/jonigl/mcp-client-for-ollama
+
+Example start command (inside the `mcp-clien` folder):
+``` bash
+uvx ollmcp --servers-json ./servers.json -m gpt-oss
+```
+
 ## Deploy
 
-
-## TODO:
-
-- CodeCommit repository
-- CodePipeline
-    * Infrastructure deployment
-    * Lambda deployment
-- Stage variables to the CF templates
-- 
+Deployment instructions coming soon. 
