@@ -8,6 +8,32 @@ services:
     volumes:
       - "./docker/dynamodb:/home/dynamodblocal/data:z"
     working_dir: /home/dynamodblocal
+  dynamodb-mcp-server:
+    depends_on:
+      - dynamodb-local
+    image: ghcr.io/open-webui/mcpo:main
+    ports:
+      - "8001:8000"
+    environment:
+      - AWS_ACCESS_KEY_ID=localDbCredentialId
+      - AWS_SECRET_ACCESS_KEY=localDbCredentialKey
+      - AWS_REGION=eu-north-1
+      - DYNAMO_DB_URL=http://dynamodb-local:8000
+    volumes:
+      - ./dynamo-readonly-mcp:/dynamo-readonly-mcp:z
+    command: mcpo --host 0.0.0.0 --port 8000 -- node /dynamo-readonly-mcp/dist/index.js
+  open-webui:
+    depends_on:
+      - dynamodb-local
+      - dynamodb-mcp-server
+    image: ghcr.io/open-webui/open-webui:main
+    network_mode: "host"
+    volumes:
+      - ./open-webui:/app/backend/data:z
+    environment:
+      - OLLAMA_BASE_URL=http://127.0.0.1:11434
+    restart: always
+
   # deploy-table:
   #   depends_on:
   #     - dynamodb-local

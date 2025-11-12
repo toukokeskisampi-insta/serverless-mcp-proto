@@ -19,15 +19,27 @@ At which time should I turn on the sauna today?
 # Sauna time 3
 
 ElectricityTable columns
-- start_date, String, partition key
+- start_date, String, partition key, "YYYY-mm-dd" format
 - start_time, String, sort key, "HH:MM:ss" format
-- price, String, Price of electricity as "cents/kWh"
+- price, String, Price of electricity as "cents/kWh" (Euros)
+
+Example of a working query
+{
+  "expressionAttributeValues": {
+    ":date": "2025-11-12",
+    ":end": "22:00:00",
+    ":start": "18:00:00"
+  },
+  "keyConditionExpression": "start_date = :date AND start_time BETWEEN :start AND :end",
+  "limit": 100,
+  "tableName": "ElectricityTable"
+}
 
 Use dynamodb-readonly.query-table without projection to fetch the required data. Pay close attention on the query syntax and remember to set the keys and values in the "ExpressionAttributeValues" object.
 
-Today is 2025-11-10. The sauna needs to run for 30 minutes and uses 6kW of power. I like to go to the sauna somewhere between 18:00 and 22:00. Preferably around 20:00 but if it is over 10 cents more expensive than the cheapest option then go with the cheaper one.
+Today is 2025-11-11. The sauna needs to run for 30 minutes and uses 6kW of power. I like to go to the sauna somewhere between 18:00 and 22:00. Preferably around 20:00 but if it is over 10 cents more expensive than the cheapest option then go with the cheaper one.
 
-At which time should I turn on the sauna today and how much will it cost in total?
+At which time should I turn on the sauna tomorrow and how much will it cost in total?
 
 
 
@@ -37,13 +49,25 @@ What is the best time for turning on the sauna tomorrow?
 # Multi purpose calculations
 
 ElectricityTable columns
-- start_date, String, partition key
+- start_date, String, partition key, "YYYY-mm-dd" format
 - start_time, String, sort key, "HH:MM:ss" format
-- price, String, Price of electricity as "cents/kWh" (Euros)
+- price, String, Price of electricity as "euro cents/kWh"
+
+Example of a working query
+{
+  "expressionAttributeValues": {
+    ":date": "2025-11-12",
+    ":end": "22:00:00",
+    ":start": "18:00:00"
+  },
+  "keyConditionExpression": "start_date = :date AND start_time BETWEEN :start AND :end",
+  "limit": 100,
+  "tableName": "ElectricityTable"
+}
 
 Use dynamodb-readonly.query-table without projection to fetch the required data. Pay close attention on the query syntax and remember to set the keys and values in the "ExpressionAttributeValues" object.
 
-Today is 2025-11-10.
+Today is 2025-11-11.
 
 Consumption data:
 - Sauna, power 6000W, runtime 30min. Sauna time should be between 18:00 and 22:00
@@ -53,3 +77,21 @@ Consumption data:
 All machines can be run only between 07:00 and 22:00.
 
 Calculate optimal continuous time to run each of these machines today so least amount of electricity is used.
+
+# Peak prices
+
+ElectricityTable contains the price of electricity in 15 minute intervals.
+
+ElectricityTable columns
+- start_date, String, partition key, "YYYY-mm-dd" format
+- start_time, String, sort key, "HH:MM:ss" format
+- price, String, Price of electricity as "euro cents/kWh"
+
+Example of a working query
+{"expressionAttributeValues":{":date":"2025-11-12",":end":"22:00:00",":start":"18:00:00"},"keyConditionExpression":"start_date = :date AND start_time BETWEEN :start AND :end","limit":100,"tableName":"ElectricityTable"}
+
+Use dynamodb-readonly.query-table to fetch the required data. Pay close attention on the query syntax and remember to set the keys and values in the "ExpressionAttributeValues" object.
+
+Today is 2025-11-11
+
+When does the highest price of electricity occur and how much is it?

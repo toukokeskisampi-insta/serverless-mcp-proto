@@ -40,4 +40,6 @@ Cargo.lock
 # Lambda function dependencies (if packaged)
 .aws-sam/
 
+# Docker volumes
 rust-serverless/docker/
+rust-serverless/open-webui/
