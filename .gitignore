@@ -41,5 +41,5 @@ Cargo.lock
 .aws-sam/
 
 # Docker volumes
-rust-serverless/docker/
-rust-serverless/open-webui/
+server/docker/
+server/open-webui/

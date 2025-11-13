@@ -65,6 +65,29 @@ Example start command (inside the `mcp-clien` folder):
 uvx ollmcp --servers-json ./servers.json -m gpt-oss
 ```
 
+## MCP proxy
+```
+Client --> MCP proxy --> Tool LLM --> MCP Server
+              |                           |
+              |-----> Request db <--------|
+```
+
+1. When client needs something queried it creates a concise natural language or structured request which is fed to the "tool specialist LLM"
+    * A hash will be created from the query and used as a "requestId"
+    * Preferably a hash that can be checked for similarity
+2. Tool LLM interprets and attempts to do the query
+    * Store the MCP call the Tool LLM was trying to do in "request" field in "Request db"
+    * Query successful -> Store result in "success" field in "Request db"
+    * Query unsuccessful -> Append result in "error" field in "Request db" and try again with the error added to prompt (until MAX_RETRIES)
+3. On subsequent invocations the "Request db" can be checked for similar requests and those can be used as a starting point for the next request. If the request is a 100% match this could also work like a cache (just keep in mind that "success" is not the same as "correct")
+4. The "Request db" contents can be used to fine tune the Tool LLM.
+
+Problem: Electricity data is available at most for "end of tomorrow" so the "time window" will always be changing
+- Tool LLM should still run the query and return an empty array
+- But then query with "2026-01-01" will get cached with an "empty array" in result
+- Solution is to add TTL for request db items or purge them some other way
+- Relative times do work correctly since "day after tomorrow" will always be empty
+
 ## Deploy
 
 Deployment instructions coming soon. 

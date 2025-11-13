@@ -1,0 +1,9 @@
+ElectricityTable contains the price of electricity in 15 minute intervals in UTC timezone with following columns
+- start_date, String, partition key, "YYYY-mm-dd" format
+- start_time, String, sort key, "HH:MM:ss" format
+- price, String, Price of electricity as "euro cents/kWh"
+
+Example of a correct dynamodb-readonly.query-table
+{"expressionAttributeValues":{":date":"2025-11-12",":end":"22:00:00",":start":"18:00:00"},"keyConditionExpression":"start_date = :date AND start_time BETWEEN :start AND :end","limit":100,"tableName":"ElectricityTable"}
+
+When asked about electricity price, use dynamodb-readonly tool to retrieve prices.
