@@ -26,6 +26,7 @@
             border: 1px solid #ccc;
             padding: 10px;
             height: max-content;
+            min-height: 400px;
             width: 50vw;
             overflow-y: scroll;
             align-self: center;
@@ -38,6 +39,14 @@
 
         .chat-row>p:nth-child(2) {
             font-style: italic;
+        }
+
+        .tool-output {
+            font-size: 12px;
+        }
+
+        .tool-output {
+            font-size: 14px;
         }
 
         #similarPrompts {
@@ -84,6 +93,8 @@
 
     <script>
         async function sendMessage() {
+            const chatOutput = document.getElementById('chatOutput');
+            chatOutput.innerHTML = '';
             const message = document.getElementById('chatInput').value;
             const response = await fetch('http://localhost:3004/chat', {
                 method: 'POST',
@@ -94,7 +105,6 @@
             });
 
             const data = await response.json();
-            const chatOutput = document.getElementById('chatOutput');
             data.response.forEach(element => {
                 if (element.role === "system") {
                     return;
@@ -108,12 +118,16 @@
                 }
                 role.innerHTML = roleText;
                 const content = document.createElement('p');
+                if (element.role === "tool") {
+                    content.className = "tool-output";
+                }
                 content.innerHTML = marked.parse(element.content);
                 row.appendChild(role);
 
                 if (element.thinking) {
                     const thinking = document.createElement('p');
-                    thinking.innerHTML = "Thinking: " + marked.parse(element.thinking);
+                    thinking.className = "thinking-output";
+                    thinking.innerHTML = marked.parse(element.thinking);
                     row.appendChild(thinking);
                 }
 

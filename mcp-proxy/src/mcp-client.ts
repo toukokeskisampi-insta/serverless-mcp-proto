@@ -10,27 +10,44 @@ import {
 dotenv.config();
 
 // granite4:3b
+// granite4:1b
 // llama3.2:3b
 // gpt-oss:latest
+// granite4:350m
 
 const TOOL_MODEL = "granite4:3b";
 const ANALYZE_MODEL = "gpt-oss:latest";
+const USER_TIMEZONE = "EET";
 
-const getSystemPrompt = () => `
-Your function is to read electricity data from DynamoDB using available tools and give a short answer based on returned data using the EET timezone.
+const getSystemPrompt = () => {
+    const now = new Date();
+    const utcDate = now.toISOString().split('T')[0]; // YYYY-MM-DD
+    const utcTime = now.toISOString().split('T')[1].replace(/\.\d+Z$/, 'Z'); // HH:MM:SSZ
+    return `
+Your function is to read electricity data from DynamoDB using available tools and give a short answer based on returned in the ${USER_TIMEZONE} timezone and in the same language as the request.
 
-Today is ${new Date().toLocaleDateString()} and the time is ${new Date().toLocaleTimeString()} in EET timezone
+Today is ${utcDate} and the time is ${utcTime}
 
 ElectricityTable contains the price of electricity for each 15 minutes of each hour of the day. Use query-table to find prices for specific times.
 
 ElectricityTable columns
-* start_date, String, partition key, "YYYY-mm-dd" format
-* start_time, String, sort key, "HH:MM:ss" format, UTC timezone
+* start_date, String, partition key, "YYYY-MM-DD" format
+* start_time, String, sort key, "HH:mm:ssZ" format, UTC timezone
 * price, String, Price of electricity as "euro cents/kWh"
 
-Example of a query
-{"ExpressionAttributeValues":{":date":"2025-11-12",":end":"22:00:00",":start":"18:00:00"},"KeyConditionExpression":"start_date = :date AND start_time BETWEEN :start AND :end","limit":100,"TableName":"ElectricityTable"}
+Query example
+{
+    "ExpressionAttributeValues": {
+        ":date":"2025-11-12",
+        ":start":"18:00:00Z",
+        ":end":"22:00:00Z"
+    },
+    "KeyConditionExpression": "start_date = :date AND start_time BETWEEN :start AND :end",
+    "limit":100,
+    "TableName":"ElectricityTable"
+}
 `;
+}
 
 const getToolCalls = (message: Message): ToolCall[] => message.tool_calls ? message.tool_calls : [];
 const parseErrorMessage = (error: unknown): string => error !== null && typeof error === "object" && "message" in error ? error.message as string : "Could not parse error message";

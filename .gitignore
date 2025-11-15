@@ -43,3 +43,5 @@ Cargo.lock
 # Docker volumes
 server/docker/
 server/open-webui/
+
+dist/

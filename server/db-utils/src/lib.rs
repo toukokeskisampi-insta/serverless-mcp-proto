@@ -14,7 +14,7 @@ pub struct DataPoint {
 pub fn build_data_point(price: String, start_timestamp: String, end_timestamp: String) -> DataPoint {
     let dt = DateTime::parse_from_rfc3339(&start_timestamp).unwrap();
     let start_date = dt.format("%Y-%m-%d").to_string();
-    let start_time = dt.format("%H:%M:%S").to_string();
+    let start_time = dt.format("%H:%M:%SZ").to_string();
     DataPoint {
         start_date,
         start_time,
