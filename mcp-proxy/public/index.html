@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>LLM Chat</title>
+    <style>
+        .chat-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .output-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #chatInput {
+            width: 500px;
+            padding: 2px;
+        }
+
+        #chatOutput {
+            border: 1px solid #ccc;
+            padding: 10px;
+            height: max-content;
+            width: 50vw;
+            overflow-y: scroll;
+            align-self: center;
+            border-bottom: 1px solid grey;
+        }
+
+        .chat-row>div {
+            font-weight: bold;
+        }
+
+        .chat-row>p:nth-child(2) {
+            font-style: italic;
+        }
+
+        #similarPrompts {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #similarPrompts li {
+            margin-bottom: 5px;
+            padding: 5px;
+            border: 1px solid #eee;
+        }
+
+        /* Generic table styles */
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+    <script src="/marked.min.js"></script>
+</head>
+
+<body>
+    <h1>LLM Chat</h1>
+    <div class="chat-box">
+        <textarea rows="6" type="text" id="chatInput" placeholder="Type your message"></textarea>
+        <button onclick="sendMessage()">Send</button>
+    </div>
+    <div class="output-box">
+        <div id="chatOutput"></div>
+    </div>
+    <ul id="similarPrompts"></ul>
+
+    <script>
+        async function sendMessage() {
+            const message = document.getElementById('chatInput').value;
+            const response = await fetch('http://localhost:3004/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ message })
+            });
+
+            const data = await response.json();
+            const chatOutput = document.getElementById('chatOutput');
+            data.response.forEach(element => {
+                if (element.role === "system") {
+                    return;
+                }
+                const row = document.createElement('div');
+                row.className = "chat-row";
+                const role = document.createElement('div');
+                let roleText = element.role.toUpperCase();
+                if (element.tool_calls && element.tool_calls.length > 0) {
+                    roleText += ` (${element.tool_calls[0].function.name})`;
+                }
+                role.innerHTML = roleText;
+                const content = document.createElement('p');
+                content.innerHTML = marked.parse(element.content);
+                row.appendChild(role);
+
+                if (element.thinking) {
+                    const thinking = document.createElement('p');
+                    thinking.innerHTML = "Thinking: " + marked.parse(element.thinking);
+                    row.appendChild(thinking);
+                }
+
+                row.appendChild(content);
+
+                chatOutput.appendChild(row);
+            });
+
+            const similarPrompts = document.getElementById('similarPrompts');
+            data.similarPrompts.forEach(element => {
+                const row = document.createElement('li');
+                row.innerHTML = JSON.stringify(element);
+                similarPrompts.appendChild(row);
+            });
+        }
+    </script>
+</body>
+
+</html>

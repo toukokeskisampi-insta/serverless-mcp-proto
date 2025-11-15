@@ -21,19 +21,19 @@ services:
       - DYNAMO_DB_URL=http://dynamodb-local:8000
     volumes:
       - ./dynamo-readonly-mcp:/dynamo-readonly-mcp:z
+    # Run with MCP HTTP -> Stdio proxy
     command: mcpo --host 0.0.0.0 --port 8000 -- node /dynamo-readonly-mcp/dist/index.js
-  open-webui:
-    depends_on:
-      - dynamodb-local
-      - dynamodb-mcp-server
-    image: ghcr.io/open-webui/open-webui:main
-    network_mode: "host"
-    volumes:
-      - ./open-webui:/app/backend/data:z
-    environment:
-      - OLLAMA_BASE_URL=http://127.0.0.1:11434
-    restart: always
-
+  # open-webui:
+  #   depends_on:
+  #     - dynamodb-local
+  #     - dynamodb-mcp-server
+  #   image: ghcr.io/open-webui/open-webui:main
+  #   network_mode: "host"
+  #   volumes:
+  #     - ./open-webui:/app/backend/data:z
+  #   environment:
+  #     - OLLAMA_BASE_URL=http://127.0.0.1:11434
+  #   restart: always
   # deploy-table:
   #   depends_on:
   #     - dynamodb-local

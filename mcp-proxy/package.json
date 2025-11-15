@@ -1,0 +1,36 @@
+{
+  "name": "mcp-proxy",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.ts",
+  "type": "module",
+  "scripts": {
+    "start": "node app.ts",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.774.0",
+    "@aws-sdk/lib-dynamodb": "^3.774.0",
+    "@modelcontextprotocol/sdk": "^1.22.0",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "minhash": "^0.0.9",
+    "ollama": "^0.6.2",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@types/express": "^5.0.5",
+    "@types/node": "^24.10.1",
+    "eslint": "^9.39.1",
+    "globals": "^16.5.0",
+    "jiti": "^2.6.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.4"
+  }
+}
